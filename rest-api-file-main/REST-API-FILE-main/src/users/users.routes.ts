@@ -25,3 +25,17 @@ userRouter.post("/register", async (req: Request, res: Response) => {
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: (error as Error).message });
     }
 });
+// Delete a user
+userRouter.delete("/users/:id", async (req: Request, res: Response) => {
+    try {
+        const user = await database.findOne(req.params.id);
+        if (!user) {
+            return res.status(StatusCodes.NOT_FOUND).json({ error: "User does not exist" });
+        }
+
+        await database.remove(req.params.id);
+        return res.status(StatusCodes.OK).json({ msg: "User deleted" });
+    } catch (error) {
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: (error as Error).message });
+    }
+});
