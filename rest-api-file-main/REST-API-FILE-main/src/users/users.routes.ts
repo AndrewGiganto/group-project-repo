@@ -25,3 +25,27 @@ userRouter.post("/register", async (req: Request, res: Response) => {
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: (error as Error).message });
     }
 });
+// Get all users
+userRouter.get("/users", async (req : Request, res : Response) => {
+    try {
+        const allUsers: UnitUser[] = await database.findAll();
+        if (allUsers.length === 0) { // Fix: Use length check instead of `if (!allUsers)`
+            return res.status(StatusCodes.NOT_FOUND).json({ msg: "No users at this time..." });
+        }
+        return res.status(StatusCodes.OK).json({ total_user: allUsers.length, allUsers });
+    } catch (error) {
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: (error as Error).message });
+    }
+});
+
+userRouter.get("/users/:id", async (req: Request, res: Response) => {
+    try {
+        const user: UnitUser | null = await database.findOne(req.params.id);
+        if (!user) {
+            return res.status(StatusCodes.NOT_FOUND).json({ error: "User not found!" });
+        }
+        return res.status(StatusCodes.OK).json({ user });
+    } catch (error) {
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: (error as Error).message });
+    }
+});
